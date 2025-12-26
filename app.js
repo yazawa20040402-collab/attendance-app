@@ -54,3 +54,7 @@ $("complete").addEventListener("click", async () => {
     setStatus(e.message, "err");
   }
 });
+fetch(API_URL)
+  .then(r => r.text())
+  .then(t => alert(t))
+  .catch(e => alert(e));
