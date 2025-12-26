@@ -1,62 +1,5 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbysylzOCiixYsk5m8x21V0Li8oCA6tT4AFq2QEGRjkYYwrnrnsGUVmLAQfNx4IORs-I/exec";
 
-
-const $ = (id) => document.getElementById(id);
-const statusEl = $("status");
-
-function setStatus(msg, type="") {
-  statusEl.textContent = msg;
-  statusEl.className = "status " + type;
-}
-
-async function callApi(action, extra={}) {
-  const traineeId = $("traineeId").value.trim();
-  if (!traineeId) throw new Error("研修生IDを入力してください");
-
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action, traineeId, ...extra }),
-  });
-
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok || !data.ok) throw new Error(data.message || `API error: ${res.status}`);
-  return data;
-}
-
-$("clockin").addEventListener("click", async () => {
-  try {
-    setStatus("出勤送信中…");
-    const data = await callApi("clockin");
-    setStatus(data.message, "ok");
-  } catch (e) {
-    setStatus(e.message, "err");
-  }
-});
-
-$("clockout").addEventListener("click", async () => {
-  try {
-    setStatus("退勤送信中…");
-    const data = await callApi("clockout");
-    setStatus(data.work ? `${data.message}（勤務：${data.work}）` : data.message, "ok");
-  } catch (e) {
-    setStatus(e.message, "err");
-  }
-});
-
-$("complete").addEventListener("click", async () => {
-  try {
-    setStatus("完了報告送信中…");
-    const appUrl = location.href.replace(/#.*$/, "");
-    const data = await callApi("complete", { appUrl });
-    setStatus(data.message, "ok");
-  } catch (e) {
-    setStatus(e.message, "err");
-  }
-});
-
-const API_URL = "https://script.google.com/macros/s/AKfycbysylzOCiixYsk5m8x21V0Li8oCA6tT4AFq2QEGRjkYYwrnrnsGUVmLAQfNx4IORs-I/exec";
-
 const $ = (id) => document.getElementById(id);
 const statusEl = $("status");
 
@@ -65,13 +8,17 @@ function setStatus(msg, type = "") {
   statusEl.className = "status " + type;
 }
 
-// ★CORS回避：no-cors + form送信（レスポンスは読まない）
+// ★これが見えたら「新しいapp.jsが読めてる」確定
+setStatus("v3 loaded（no-cors送信）", "");
+
 async function callApi(action, extra = {}) {
   const traineeId = $("traineeId").value.trim();
   if (!traineeId) throw new Error("研修生IDを入力してください");
 
+  // ★フォーム形式で送る（GAS側は e.parameter で受け取れる）
   const params = new URLSearchParams({ action, traineeId, ...extra });
 
+  // ★CORS回避：レスポンスは読まない
   await fetch(API_URL, {
     method: "POST",
     mode: "no-cors",
@@ -87,7 +34,7 @@ $("clockin").addEventListener("click", async () => {
     await callApi("clockin");
     setStatus("送信しました。LINE/スプレッドシートを確認してください。", "ok");
   } catch (e) {
-    setStatus(e.message, "err");
+    setStatus(String(e.message || e), "err");
   }
 });
 
@@ -97,7 +44,7 @@ $("clockout").addEventListener("click", async () => {
     await callApi("clockout");
     setStatus("送信しました。LINE/スプレッドシートを確認してください。", "ok");
   } catch (e) {
-    setStatus(e.message, "err");
+    setStatus(String(e.message || e), "err");
   }
 });
 
@@ -108,124 +55,6 @@ $("complete").addEventListener("click", async () => {
     await callApi("complete", { appUrl });
     setStatus("送信しました。LINE/スプレッドシートを確認してください。", "ok");
   } catch (e) {
-    setStatus(e.message, "err");
-  }
-});
-const API_URL = "https://script.google.com/macros/s/AKfycbysylzOCiixYsk5m8x21V0Li8oCA6tT4AFq2QEGRjkYYwrnrnsGUVmLAQfNx4IORs-I/exec";
-
-const $ = (id) => document.getElementById(id);
-const statusEl = $("status");
-
-function setStatus(msg, type = "") {
-  statusEl.textContent = msg;
-  statusEl.className = "status " + type;
-}
-
-// v2 を表示（これが見えれば新app.jsが読めてる）
-setStatus("v2 loaded（キャッシュ更新中）", "");
-
-async function callApi(action, extra = {}) {
-  const traineeId = $("traineeId").value.trim();
-  if (!traineeId) throw new Error("研修生IDを入力してください");
-
-  const params = new URLSearchParams({ action, traineeId, ...extra });
-
-  // ★CORS回避：no-cors（レスポンスは読まない）
-  await fetch(API_URL, {
-    method: "POST",
-    mode: "no-cors",
-    body: params,
-  });
-
-  return { ok: true };
-}
-
-$("clockin").addEventListener("click", async () => {
-  try {
-    setStatus("出勤送信中…");
-    await callApi("clockin");
-    setStatus("送信しました。LINE/スプレッドシートを確認してください。", "ok");
-  } catch (e) {
-    setStatus(e.message, "err");
-  }
-});
-
-$("clockout").addEventListener("click", async () => {
-  try {
-    setStatus("退勤送信中…");
-    await callApi("clockout");
-    setStatus("送信しました。LINE/スプレッドシートを確認してください。", "ok");
-  } catch (e) {
-    setStatus(e.message, "err");
-  }
-});
-
-$("complete").addEventListener("click", async () => {
-  try {
-    setStatus("完了報告送信中…");
-    const appUrl = location.href.replace(/#.*$/, "");
-    await callApi("complete", { appUrl });
-    setStatus("送信しました。LINE/スプレッドシートを確認してください。", "ok");
-  } catch (e) {
-    setStatus(e.message, "err");
-  }
-});
-const API_URL = "https://script.google.com/macros/s/AKfycbysylzOCiixYsk5m8x21V0Li8oCA6tT4AFq2QEGRjkYYwrnrnsGUVmLAQfNx4IORs-I/exec";
-
-const $ = (id) => document.getElementById(id);
-const statusEl = $("status");
-
-function setStatus(msg, type = "") {
-  statusEl.textContent = msg;
-  statusEl.className = "status " + type;
-}
-
-// v2 を表示（これが見えれば新app.jsが読めてる）
-setStatus("v2 loaded（キャッシュ更新中）", "");
-
-async function callApi(action, extra = {}) {
-  const traineeId = $("traineeId").value.trim();
-  if (!traineeId) throw new Error("研修生IDを入力してください");
-
-  const params = new URLSearchParams({ action, traineeId, ...extra });
-
-  // ★CORS回避：no-cors（レスポンスは読まない）
-  await fetch(API_URL, {
-    method: "POST",
-    mode: "no-cors",
-    body: params,
-  });
-
-  return { ok: true };
-}
-
-$("clockin").addEventListener("click", async () => {
-  try {
-    setStatus("出勤送信中…");
-    await callApi("clockin");
-    setStatus("送信しました。LINE/スプレッドシートを確認してください。", "ok");
-  } catch (e) {
-    setStatus(e.message, "err");
-  }
-});
-
-$("clockout").addEventListener("click", async () => {
-  try {
-    setStatus("退勤送信中…");
-    await callApi("clockout");
-    setStatus("送信しました。LINE/スプレッドシートを確認してください。", "ok");
-  } catch (e) {
-    setStatus(e.message, "err");
-  }
-});
-
-$("complete").addEventListener("click", async () => {
-  try {
-    setStatus("完了報告送信中…");
-    const appUrl = location.href.replace(/#.*$/, "");
-    await callApi("complete", { appUrl });
-    setStatus("送信しました。LINE/スプレッドシートを確認してください。", "ok");
-  } catch (e) {
-    setStatus(e.message, "err");
+    setStatus(String(e.message || e), "err");
   }
 });
