@@ -1,0 +1,8 @@
+{
+  "name": "出退勤打刻",
+  "short_name": "打刻",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0b1020",
+  "theme_color": "#0b1020"
+}
