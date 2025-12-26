@@ -1,0 +1,16 @@
+async function callApi(action, extra = {}) {
+  const traineeId = $("traineeId").value.trim();
+  if (!traineeId) throw new Error("研修生IDを入力してください");
+
+  const params = new URLSearchParams({ action, traineeId, ...extra });
+
+  // ★no-corsで送る（レスポンスは読めない＝opaqueになる）
+  await fetch(API_URL, {
+    method: "POST",
+    mode: "no-cors",
+    body: params
+  });
+
+  // ここまで来たら「送信」はできた扱いにする
+  return { ok: true };
+}
