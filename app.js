@@ -1,4 +1,5 @@
-const API_URL = "YOUR_GAS_WEBAPP_URL"; // ←あとで /exec に置き換える
+const API_URL = "https://script.google.com/macros/s/AKfycbysylzOCiixYsk5m8x21V0Li8oCA6tT4AFq2QEGRjkYYwrnrnsGUVmLAQfNx4IORs-I/exec";
+
 
 const $ = (id) => document.getElementById(id);
 const statusEl = $("status");
