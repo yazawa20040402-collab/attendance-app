@@ -1,4 +1,5 @@
-const CACHE = "attendance-pwa-v2";
+const CACHE = "attendance-pwa-v3";
+
 const ASSETS = ["./","./index.html","./style.css","./app.js","./manifest.json"];
 
 self.addEventListener("install", (e) => {
