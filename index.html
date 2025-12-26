@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>出退勤打刻</title>
+  <meta name="theme-color" content="#0b1020" />
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="glass">
+    <header class="header">
+      <div class="badge">PWA</div>
+      <h1>出退勤打刻</h1>
+      <p class="sub">ワンタップで打刻 → Sheets記録 → LINE通知</p>
+    </header>
+
+    <section class="panel">
+      <label class="field">
+        <span>研修生ID</span>
+        <input id="traineeId" value="user01" autocomplete="off" />
+      </label>
+
+      <div class="grid">
+        <button id="clockin" class="btn">出勤</button>
+        <button id="clockout" class="btn">退勤</button>
+        <button id="complete" class="btn primary">🎉課題完了報告</button>
+      </div>
+
+      <div id="status" class="status"></div>
+      <div class="footnote">※LINEトークンはGAS側に保持</div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js");
+  </script>
+</body>
+</html>
